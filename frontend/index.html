@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPL Win Predictor | Pro Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            /* Cyberpunk / Night Cricket Theme */
+            --primary: #ff0055;
+            --secondary: #00e5ff;
+            --accent: #7000ff;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #a0a0b0;
+            --success: #00ff88;
+            --danger: #ff2a2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: #050505;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* --- ANIMATED BACKGROUND ORBS --- */
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 10s infinite ease-in-out;
+            opacity: 0.4;
+        }
+        .orb-1 { width: 300px; height: 300px; background: var(--primary); top: -50px; left: -50px; animation-duration: 12s; }
+        .orb-2 { width: 400px; height: 400px; background: var(--accent); bottom: -100px; right: -100px; animation-duration: 15s; animation-delay: 2s; }
+        .orb-3 { width: 200px; height: 200px; background: var(--secondary); top: 40%; left: 50%; transform: translate(-50%, -50%); opacity: 0.2; animation-duration: 20s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -30px); }
+        }
+
+        /* --- MAIN GLASS CARD --- */
+        .container {
+            background: rgba(18, 18, 25, 0.7);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            padding: 3rem;
+            border-radius: 30px;
+            width: 90%;
+            max-width: 480px;
+            position: relative;
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* --- HEADER --- */
+        header { text-align: center; margin-bottom: 2.5rem; }
+        
+        h1 {
+            font-weight: 800;
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #fff, #a0a0a0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* --- INPUTS --- */
+        .input-group { margin-bottom: 1.5rem; position: relative; }
+        
+        label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .input-wrapper { position: relative; }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            transition: color 0.3s ease;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 16px 16px 16px 48px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: rgba(0, 229, 255, 0.05);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+        }
+
+        select option {
+            background-color: #121219;
+            color: white;
+            padding: 12px;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2300e5ff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 0.65rem auto;
+        }
+
+        .input-wrapper:focus-within i { color: var(--secondary); }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* --- BUTTON --- */
+        .predict-btn {
+            width: 100%;
+            padding: 18px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, var(--primary), #d9004c);
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            color: white;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(255, 0, 85, 0.2);
+        }
+
+        .predict-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: 0.5s;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(255, 0, 85, 0.4);
+        }
+
+        .predict-btn:hover::before { left: 100%; }
+        
+        .predict-btn:disabled { 
+            opacity: 0.7; 
+            cursor: wait; 
+            filter: grayscale(100%);
+        }
+
+        /* --- HOLOGRAPHIC LOADER STYLES --- */
+        #loader-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            border-radius: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader-wrapper {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cricket-ball-core {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle at 30% 30%, #ff0055, #880000);
+            border-radius: 50%;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 0 30px var(--primary);
+            animation: corePulse 1.5s ease-in-out infinite alternate;
+        }
+
+        .cricket-ball-core::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            width: 4px; height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border-left: 1px dashed #333;
+            border-right: 1px dashed #333;
+            transform: translateX(-50%) rotate(0deg);
+            animation: seamSpin 1s linear infinite;
+            filter: blur(0.5px);
+        }
+
+        .scan-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            animation: scanRotate linear infinite;
+        }
+
+        .ring-1 {
+            width: 100%; height: 100%;
+            border-top: 3px solid var(--secondary);
+            border-right: 1px solid rgba(0, 229, 255, 0.3);
+            animation-duration: 2s;
+            filter: drop-shadow(0 0 10px var(--secondary));
+        }
+
+        .ring-2 {
+            width: 80%; height: 80%;
+            border-bottom: 3px solid var(--accent);
+            border-left: 1px solid rgba(112, 0, 255, 0.3);
+            animation-duration: 3s;
+            animation-direction: reverse;
+            filter: drop-shadow(0 0 10px var(--accent));
+        }
+
+        .loader-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 160%; height: 160%;
+            background: radial-gradient(circle, rgba(255, 0, 85, 0.1) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            animation: glowPulse 2s infinite;
+        }
+
+        .loader-text {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            animation: pulse 1.5s infinite;
+            margin-top: 10px;
+        }
+
+        @keyframes seamSpin {
+            0% { transform: translateX(-50%) rotate(0deg) scaleY(1); }
+            50% { transform: translateX(-50%) rotate(180deg) scaleY(0.95); }
+            100% { transform: translateX(-50%) rotate(360deg) scaleY(1); }
+        }
+        @keyframes scanRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes corePulse { 0% { transform: scale(1); box-shadow: 0 0 20px var(--primary); } 100% { transform: scale(1.1); box-shadow: 0 0 50px var(--primary), inset 0 0 10px #ffaaaa; } }
+        @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+
+        /* --- CUSTOM TOAST NOTIFICATIONS --- */
+        #toast-container {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .toast {
+            background: rgba(18, 18, 25, 0.95);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            color: #fff;
+            padding: 16px 24px;
+            border-radius: 12px;
+            min-width: 320px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards,
+                       fadeOut 0.5s ease 3s forwards;
+        }
+
+        /* Error Style */
+        .toast.error {
+            border-left: 4px solid var(--danger);
+            box-shadow: 0 5px 20px rgba(255, 42, 42, 0.2);
+        }
+        .toast.error i { color: var(--danger); font-size: 1.2rem; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-50px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateY(-20px); pointer-events: none; }
+        }
+
+        /* --- RESULTS AREA --- */
+        .result-box {
+            margin-top: 0;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .result-box.active {
+            margin-top: 30px;
+            max-height: 200px;
+            opacity: 1;
+            padding-top: 25px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .team-stat { margin-bottom: 15px; }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .progress-track {
+            background: rgba(255,255,255,0.1);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 6px;
+            transition: width 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+            position: relative;
+        }
+
+        .fill-win { background: linear-gradient(90deg, #00ff88, #00b862); box-shadow: 0 0 15px rgba(0, 255, 136, 0.4); }
+        .fill-lose { background: linear-gradient(90deg, #ff4444, #b20036); box-shadow: 0 0 15px rgba(255, 68, 68, 0.4); }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <div id="toast-container"></div>
+
+    <div class="container">
+        
+        <div id="loader-overlay">
+            <div class="loader-wrapper">
+                <div class="scan-ring ring-1"></div>
+                <div class="scan-ring ring-2"></div>
+                <div class="cricket-ball-core"></div>
+            </div>
+            <p class="loader-text" id="loader-text">Waking up AI Server...</p>
+        </div>
+
+        <header>
+            <h1>IPL Win Predictor</h1>
+        </header>
+
+        <form onsubmit="return false;">
+            <div class="input-group">
+                <label>Batting Team</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-cricket-bat-ball"></i>
+                    <select id="batting_team">
+                        <option value="" disabled selected>Select Team</option>
+                        <option>Chennai Super Kings</option>
+                        <option>Mumbai Indians</option>
+                        <option>Royal Challengers Bangalore</option>
+                        <option>Kolkata Knight Riders</option>
+                        <option>Rajasthan Royals</option>
+                        <option>Sunrisers Hyderabad</option>
+                        <option>Delhi Capitals</option>
+                        <option>Punjab Kings</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Bowling Team</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-bullseye"></i>
+                    <select id="bowling_team">
+                        <option value="" disabled selected>Select Team</option>
+                        <option>Chennai Super Kings</option>
+                        <option>Mumbai Indians</option>
+                        <option>Royal Challengers Bangalore</option>
+                        <option>Kolkata Knight Riders</option>
+                        <option>Rajasthan Royals</option>
+                        <option>Sunrisers Hyderabad</option>
+                        <option>Delhi Capitals</option>
+                        <option>Punjab Kings</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Stadium City</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-location-dot"></i>
+                    <select id="city">
+                        <option value="">Waiting for server...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="input-group">
+                    <label>Target Score</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-flag-checkered"></i>
+                        <input type="number" id="target" placeholder="e.g. 180">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Current Score</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-chart-line"></i>
+                        <input type="number" id="score" placeholder="e.g. 120" oninput="calculateRunsLeft()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="input-group">
+                    <label>Balls Left</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-stopwatch"></i>
+                        <input type="number" id="balls_left" placeholder="e.g. 30">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Wickets Down</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-users-slash"></i>
+                        <input type="number" id="wickets" placeholder="e.g. 4">
+                    </div>
+                </div>
+            </div>
+
+            <input type="hidden" id="runs_left">
+
+            <button class="predict-btn" id="predict-btn" onclick="predict()">
+                Calculate Probability
+            </button>
+        </form>
+
+        <div id="result" class="result-box">
+            </div>
+    </div>
+
+    <script>
+        const API_URL = "https://ipl-win-predictor-1-ieox.onrender.com";
+        
+        // Element References
+        const loader = document.getElementById("loader-overlay");
+        const loaderText = document.getElementById("loader-text");
+        const citySelect = document.getElementById("city");
+        const resultBox = document.getElementById("result");
+        const predictBtn = document.getElementById("predict-btn");
+        const formInputs = document.querySelectorAll("select, input, button");
+        const toastContainer = document.getElementById("toast-container");
+
+        // --- NEW TOAST FUNCTION ---
+        function showToast(message, type = "error") {
+            const toast = document.createElement("div");
+            toast.classList.add("toast", type);
+            
+            // Icon based on type
+            const icon = type === "error" ? "fa-circle-exclamation" : "fa-circle-check";
+            
+            toast.innerHTML = `
+                <i class="fas ${icon}"></i>
+                <span>${message}</span>
+            `;
+            
+            toastContainer.appendChild(toast);
+
+            // Remove after animation (3.5s total)
+            setTimeout(() => {
+                toast.remove();
+            }, 3500);
+        }
+
+        // 1. Loading Sequence
+        const loadingMessages = [
+            "Waking up the server...",
+            "Checking pitch report...",
+            "Analyzing weather...",
+            "Almost ready..."
+        ];
+        let msgIndex = 0;
+        
+        const msgInterval = setInterval(() => {
+            msgIndex = (msgIndex + 1) % loadingMessages.length;
+            loaderText.innerText = loadingMessages[msgIndex];
+        }, 1500);
+
+        // Disable inputs while loading
+        formInputs.forEach(el => el.disabled = true);
+
+        // 2. Fetch Cities
+        fetch(`${API_URL}/cities`)
+        .then(res => res.json())
+        .then(cities => {
+            clearInterval(msgInterval);
+            loaderText.innerText = "Stadiums Loaded!";
+            
+            citySelect.innerHTML = '<option value="">Select Stadium</option>';
+            cities.forEach(c => {
+                const opt = document.createElement("option");
+                opt.value = c;
+                opt.textContent = c;
+                citySelect.appendChild(opt);
+            });
+
+            setTimeout(() => {
+                loader.style.opacity = "0";
+                setTimeout(() => {
+                    loader.style.display = "none";
+                    formInputs.forEach(el => el.disabled = false);
+                }, 500);
+            }, 800);
+        })
+        .catch(err => {
+            clearInterval(msgInterval);
+            loaderText.style.color = "#ff2a2a";
+            loaderText.innerText = "Server Error. Please Refresh.";
+        });
+
+        // 3. Auto-calc runs left
+        function calculateRunsLeft() {
+            const target = document.getElementById("target").value;
+            const score = document.getElementById("score").value;
+            if(target && score) {
+                document.getElementById("runs_left").value = target - score;
+            }
+        }
+
+        // 4. Prediction Logic
+        function predict() {
+            const batting_team = document.getElementById("batting_team").value;
+            const bowling_team = document.getElementById("bowling_team").value;
+            const city = document.getElementById("city").value;
+            const target = document.getElementById("target").value;
+            const score = document.getElementById("score").value;
+            const balls_left = document.getElementById("balls_left").value;
+            const wickets = document.getElementById("wickets").value;
+
+            // Check 1: Empty Fields
+            if (!batting_team || !bowling_team || !city || !target || !score || !balls_left || !wickets) {
+                showToast("Please fill in all fields to predict!", "error");
+                return;
+            }
+
+            // Check 2: Same Team Validation
+            if (batting_team === bowling_team) {
+                showToast("Teams cannot be the same!", "error");
+                return;
+            }
+
+            predictBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Analyzing...';
+            predictBtn.disabled = true;
+            resultBox.classList.remove("active");
+
+            const data = {
+                batting_team, bowling_team, city,
+                runs_left: target - score,
+                balls_left,
+                wickets: 10 - wickets,
+                target
+            };
+
+            fetch(`${API_URL}/predict`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(r => {
+                predictBtn.innerHTML = 'Calculate Probability';
+                predictBtn.disabled = false;
+                displayResult(batting_team, r.win_prob, bowling_team, r.lose_prob);
+            })
+            .catch(err => {
+                predictBtn.innerHTML = 'Try Again';
+                predictBtn.disabled = false;
+                showToast("Error connecting to AI backend.", "error");
+            });
+        }
+
+        function displayResult(team1, prob1, team2, prob2) {
+            const p1 = Math.round(prob1);
+            const p2 = Math.round(prob2);
+
+            resultBox.innerHTML = `
+                <div class="team-stat">
+                    <div class="stat-header">
+                        <span>${team1}</span>
+                        <span style="color: var(--success)">${p1}%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill fill-win" style="width: 0%" id="bar1"></div>
+                    </div>
+                </div>
+                <div class="team-stat">
+                    <div class="stat-header">
+                        <span>${team2}</span>
+                        <span style="color: var(--danger)">${p2}%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill fill-lose" style="width: 0%" id="bar2"></div>
+                    </div>
+                </div>
+            `;
+
+            resultBox.classList.add("active");
+
+            setTimeout(() => {
+                document.getElementById("bar1").style.width = `${p1}%`;
+                document.getElementById("bar2").style.width = `${p2}%`;
+            }, 100);
+        }
+    </script>
+</body>
+</html>
