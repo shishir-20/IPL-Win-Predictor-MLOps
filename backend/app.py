@@ -4,13 +4,11 @@ import sys
 import os
 
 # Base paths
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ML_DIR = os.path.join(BASE_DIR, "../ml")
-ML_DIR = os.path.abspath(ML_DIR)
+ML_DIR = os.path.join(BASE_DIR, "ml")
 
-sys.path.append(ML_DIR)
-
-from predictor import predict_win
+from ml.predictor import predict_win
 
 app = Flask(__name__)
 CORS(app)
