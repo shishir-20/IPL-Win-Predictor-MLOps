@@ -6,6 +6,7 @@ import os
 # Base paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ML_DIR = os.path.join(BASE_DIR, "ml")
+ML_DIR = os.path.abspath(ML_DIR)
 
 sys.path.append(ML_DIR)
 
