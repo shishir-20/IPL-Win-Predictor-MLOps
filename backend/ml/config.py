@@ -1,14 +1,11 @@
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-DATA_DIR = os.path.join(BASE_DIR, "data")
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, "../.."))
 
-# NEW
-MODEL_DIR = os.path.join(BASE_DIR, "models")
-os.makedirs(MODEL_DIR, exist_ok=True)
+DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 
-# Latest model (used by API)
-MODEL_PATH = os.path.join(BASE_DIR, "ml", "pipe.pkl")
-
-CITIES_PATH = os.path.join(BASE_DIR, "ml", "cities.txt")
+MODEL_DIR = BASE_DIR
+MODEL_PATH = os.path.join(BASE_DIR, "pipe.pkl")
+CITIES_PATH = os.path.join(BASE_DIR, "cities.txt")

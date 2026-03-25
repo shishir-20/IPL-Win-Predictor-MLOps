@@ -1,0 +1,12 @@
+POST https://ipl-win-predictor-mlops.onrender.com/predict
+Content-Type: application/json
+
+{
+  "batting_team": "Mumbai Indians",
+  "bowling_team": "Chennai Super Kings",
+  "city": "Mumbai",
+  "runs_left": 50,
+  "balls_left": 30,
+  "wickets": 5,
+  "target": 180
+}
