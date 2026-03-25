@@ -4,25 +4,25 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   train:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: 3.9
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
+          pip install --upgrade pip
           pip install -r backend/requirements.txt
 
-      - name: Run Training Pipeline
+      - name: Run training pipeline
         run: |
-          python ml/train_pipeline.py
+          python backend/ml/train_pipeline.py
